@@ -354,7 +354,7 @@ define = {
 	142: {
 		"name": "Mouri Toushirou",
 		"type": "Tantou"
-	}
+	},
 	144: {
 		"name": "Kotegiri Gou",
 		"type": "Wakizashi"
