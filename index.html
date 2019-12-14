@@ -1,342 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <link rel="stylesheet" href="assets/main.css">
-  </head>
-  <body id="app">
-    <ul class="top">
-      <li>Saniwa<b v-if="view.player.name!=null">{{view.player.name}}</b></li>
-      <li v-if="view.player.level!=null">Lv.<b>{{view.player.level}}</b></li>
-      <li v-if="!view.resource.set">* Vào Honmaru (本丸 - trong game) để cập nhật dữ liệu mới.</li>
-      <li v-if="view.resource.charcoal!=null">Than<b>{{Math.floor(view.resource.charcoal)}}</b></li>
-      <li v-if="view.resource.steel!=null">N.Cương<b>{{Math.floor(view.resource.steel)}}</b></li>
-      <li v-if="view.resource.coolant!=null">Nước<b>{{Math.floor(view.resource.coolant)}}</b></li>
-      <li v-if="view.resource.file!=null">Đá mài<b>{{Math.floor(view.resource.file)}}</b></li>
-      <li v-if="view.resource.bill!=null">Thẻ rèn<b>{{Math.floor(view.resource.bill)}}</b></li>
-      <li v-if="view.resource.bonemeal!=null">Thẻ help<b>{{Math.floor(view.resource.bonemeal)}}</b></li>
-      <li v-if="view.resource.money!=null">Koban<b>{{Math.floor(view.resource.money)}}</b></li>
-    </ul>
-	<!-- For testing purposes -->
-	<!--ul class="top">
-      <li>Saniwa<b>都玲詩都玲詩都玲詩都玲詩</b></li>
-      <li>Lv.<b>300</b></li>
-      <li >Charcoal<b>999999</b></li>
-      <li >Steel<b>999999</b></li>
-      <li >Coolant<b>999999</b></li>
-      <li >Whetstone<b>999999</b></li>
-      <li >Req T.<b>9999</b></li>
-      <li >Help T.<b>9999</b></li>
-      <li >Koban<b>90990990</b></li>
-    </ul-->
-    <ul class="nav">
-      <li v-class="active: tab == 2" v-on="click: tab = 2">Đội ngũ</li>
-      <li v-class="active: tab == 3" v-on="click: tab = 3">Bản doanh</li>
-      <li v-class="active: tab == 5" v-on="click: tab = 5">Ghi chép</li>
-      <li v-class="active: tab == -1" v-on="click: tab = -1">Thiết lập</li>
-      <li v-class="active: tab == -2" v-on="click: tab = -2">Credit</li>
-    </ul>
-    <div class="container">
-      <div v-if="!gaming" class="outgame">Đây là dữ liệu cũ.</div>
-      <!-- 队伍列表-->
-      <div v-if="!view['party']['set']" v-show="tab==2">* Vào Xếp đội (結成 - trong game) để cập nhật dữ liệu mới.</div>
-      <!-- 队伍列表-->
-      <div v-if="view['party']['set']" v-show="tab==2">
-        <div v-if="view['party']['set']" class="party">
-          <div v-repeat="view['party']['data']" class="party-item">
-            <!-- 队伍和状态标注-->
-            <div class="name">Đội {{party_no}}<span v-show="in_battle(party_no)" class="status">[Ra trận]</span><span v-show="status==2" class="status">[Viễn chinh]</span><span v-show="status==2" class="status">[{{finished_at | conquest_time}}]</span></div>
-            <!-- 等级和兵力标注-->
-            <div class="amounts"><span class="alv">Trung bình Lv.<b>{{avearge_lv}}</b></span><span class="lva">Tổng Lv.<b>{{amount_lv}}</b></span></div>
-            <!-- 列表-->
-            <ul class="swords">
-              <li v-repeat="slot" class="ss">
-                <div v-if="serial_id==null" class="item"><img src="../../assets/sword/0.png" class="simg">
-                  <div class="c">
-                    <div class="sname">Trống</div>
-                    <div class="slv">Lv.0 (next 0)</div>
-                  </div>
-                  <div class="c">
-                    <div class="shp">HP 0 / 0</div>
-                    <div class="sf"><span class="sfico"></span>0</div>
-                  </div>
-                  <div class="c2">
-                    <div class="sequ"><span>[Trống]</span></div>
-                  </div>
-                </div>
-                <div v-if="serial_id!=null" class="item"><img v-attr="src: '../../assets/sword/' + sword_id + '.png'" class="simg">
-                  <div class="c">
-                    <div class="sname">{{name}}<span v-show="status==1" class="ssta">[Sửa]</span><span v-show="hp/hp_max&lt;=0.9 &amp;&amp; hp/hp_max&gt;0.65 &amp;&amp; status!=1" class="ssta y">[Nhẹ]</span><span v-show="hp/hp_max&lt;=0.65 &amp;&amp; hp/hp_max&gt;0.3 &amp;&amp; status!=1" class="ssta o">[Vừa]</span><span v-show="hp/hp_max&lt;=0.3&amp;&amp;status!=1" class="ssta r">[Nặng]</span></div>
-                    <div class="slv">Lv.{{level}}(next {{next_exp}})</div>
-                  </div>
-                  <div class="c">
-                    <div class="shp">HP {{hp}} / {{hp_max}}</div>
-                    <div class="sf"><span v-class="r: fatigue &lt; 6,y: fatigue &gt;= 6 &amp;&amp; fatigue &lt; 20,p: fatigue &gt;= 50" class="sfico"></span><span v-show="fatigue &gt;= 50">Sakura</span><span v-show="fatigue &lt; 50 &amp;&amp; fatigue &gt;= 20">Thường</span><span v-show="fatigue &lt; 20">Mệt</span><span>{{fatigue}}</span><span v-show="fatigue &gt;= 50">(+20%)</span><span v-show="fatigue &gt;= 6 &amp;&amp; fatigue &lt; 20">(-20%)</span><span v-show="fatigue &lt; 6">(-40%)</span></div>
-                  </div>
-                  <div class="c2">
-                    <div class="sequ"><span v-if="equip_serial_id1!=null" v-class="r: equip_1['level'] == 2, ur: equip_1['level'] == 0, b: equip_1['soldier_now'] == 0">[{{equip_1['sname']}} {{equip_1['soldier_now']}}/{{equip_1['soldier_max']}}]</span><span v-if="equip_serial_id1==null&amp;&amp;max_equip&gt;=1">[Trống]</span><span v-if="equip_serial_id2!=null" v-class="r: equip_2['level'] == 2, ur: equip_2['level'] == 0, b: equip_2['soldier_now'] == 0">[{{equip_2['sname']}} {{equip_2['soldier_now']}}/{{equip_2['soldier_max']}}]</span><span v-if="equip_serial_id2==null&amp;&amp;max_equip&gt;=2">[Trống]</span><span v-if="equip_serial_id3!=null" v-class="r: equip_3['level'] == 2, ur: equip_3['level'] == 0, b: equip_3['soldier_now'] == 0">[{{equip_3['sname']}} {{equip_3['soldier_now']}}/{{equip_3['soldier_max']}}]</span><span v-if="equip_serial_id3==null&amp;&amp;max_equip&gt;=3">[Trống]</span></div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-            <div class="clear"></div>
-          </div>
-        </div>
-      </div>
-      <div v-if="tab==3" class="forge-rep">
-        <div class="panel fr">
-          <div class="t">Binh lính・Ngựa</div>
-          <div v-show="!view['equips']['set']" class="amounts">Chưa thu được dữ liệu, xin vào tab Xếp đội.</div>
-          <ul v-if="view['equips']['set']" class="equ">
-            <li v-repeat="view['equips']['data']">[{{$key | e2n}}] Hiện có {{$value}}</li>
-          </ul>
-        </div>
-        <div class="panel fr">
-          <div class="t">Rèn kiếm<span style="cursor: pointer;" v-on="click: toggleForge" class="alv">[Dự đoán kiếm rèn ra]</span></div>
-          <div class="amounts"><span class="alv">Xưởng<b>{{data['forge']['open']}}</b></span><span class="lva">* Đang rèn <b>{{checkout('forge')}}</b></span></div>
-          <div class="amounts">
-			<!--span class="alv" id="testy">See?</span><br /><span class="alv" id="idhelp">[]</span
-			** add this to parse.js:
-			/* These 2 lines are for testing/debugging purposes.
-		document.getElementById("testy").innerHTML = "SSI:" + (exports.tohken.define.tohkens[w['sword_id']] ? exports.tohken.define.tohkens[w['sword_id']]['name'] : w['sword_serial_id']);
-		document.getElementById("idhelp").innerHTML = "Data:" + w['sword_id'] + " " + exports.tohken.define.tohkens[w['sword_id']]['name'];*/-->
-		  </div>
-		  <ul class="equ">
-            <li v-repeat="data['forge']['data']">[{{finished_at | tt2lt}}] {{sword_id | fs2n}}</li>
-          </ul>
-        </div>
-        <div class="panel fr">
-          <div class="t">Phòng bảo dưỡng</div>
-          <div class="amounts"><span class="alv">Xưởng<b>{{data['repair']['open']}}</b></span><span class="lva">* Đang dưỡng thương <b>{{checkout('repair')}}</b></span></div>
-          <ul class="equ">
-            <li v-repeat="data['repair']['data']">[{{finished_at | tt2lt}}] {{sword_serial_id | sid2n}}</li>
-          </ul>
-        </div>
-      </div>
-      <div v-if="tab==5" class="logs">
-        <div class="panel">
-          <div style="cursor: pointer;" v-on="click: saveLogs()" class="t">Click vào đây để tải dữ liệu dưới dạng CSV</div>
-        </div>
-        <div class="panel">
-          <div class="t">Thống kê rèn kiếm</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Thời gian</th>
-                <th>Kiếm</th>
-                <th>Thời gian rèn</th>
-                <th>Than</th>
-                <th>N.Cương</th>
-                <th>Nước</th>
-                <th>Đá mài</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-repeat="data['logs']['forge']">
-                <!-- "1-1426389451000":{"slot_no":"1","finish_at":1426389451000,"sword_id":"45","resource":false,"charcoal":"50","coolant":"50","file":"50","steel":"50"}-->
-                <td>{{finish_at | ls2t}}</td>
-                <td>{{sword_id | ls2n}}</td>
-                <td>{{resource?times:'-'}} min</td>
-                <td>{{resource?charcoal:'-'}}</td>
-                <td>{{resource?steel:'-'}}</td>
-                <td>{{resource?coolant:'-'}}</td>
-                <td>{{resource?file:'-'}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="panel">
-          <div class="t">Thống kê rớt kiếm</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Thời gian</th>
-                <th>Team</th>
-                <th>Rank</th>
-                <th>Drop</th>
-                <th>Map</th>
-                <th>Node</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-repeat="data['logs']['battle']">
-                <td>{{time | ls2t}}</td>
-                <td>{{party_no}}</td>
-                <td>{{rank | r2r}}</td>
-                <td>{{get_sword_id | ls2n}}</td>
-                <td v-if="battle_episode>=0">{{battle_episode}}-{{battle_field}}</td>
-                <td v-if="battle_episode<0">ev</td>
-                <td>{{battle_pos}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!-- 设置-->
-      <div v-show="tab==-1">
-        <div class="panel-config">
-          <div class="t">Dữ liệu</div>
-          <ul class="sl">
-            <li>
-              <div class="act">Bật tính toán độ mệt mỏi<span v-class="on: config.cad == 0" v-on="click: applyConfig('cad', 0)">Tắt</span><span v-class="on: config.cad == 1" v-on="click: applyConfig('cad', 1)">Bật</span></div>
-              <div class="desc">Dữ liệu không chính xác hoàn toàn</div>
-              <div class="desc">Thời gian khôi phục độ mệt mỏi: 3 phút 3 điểm</div>
-              <div class="desc">Tối đa chỉ khôi phục đến 49 điểm</div>
-            </li>
-            <li>
-              <div class="act">Không nên bật<span v-class="on: config.cadOffList == 0" v-on="click: applyConfig('cadOffList', 0)">Tắt</span><span v-class="on: config.cadOffList == 1" v-on="click: applyConfig('cadOffList', 1)">Bật</span></div>
-              <div class="desc">Tính năng chưa hoàn thiện, không có việc gì không nên bật.</div>
-            </li>
-            <li>
-              <div class="act">Lưu dữ liệu trò chơi<span v-class="on: config.dataCache == 0" v-on="click: applyConfig('dataCache', 0)">Tắt</span><span v-class="on: config.dataCache == 1" v-on="click: applyConfig('dataCache', 1)">Bật</span></div>
-              <div class="desc">
-                Nên bật
-              </div>
-              <div v-show="dataExist" v-on="click: applyConfig('dataCache', -1)" style="cursor: pointer;" class="desc">< ** Xóa dữ liệu ** ></div>
-            </li>
-          </ul>
-        </div>
-        <div class="panel-config">
-          <div class="t">Nhắc nhở</div>
-          <ul class="sl">
-            <li>
-              <div class="act">1. Nhắc nhở viễn chinh<span v-class="on: config.notify_conquest == 0" v-on="click: applyConfig('notify_conquest', 0)">Tắt</span><span v-class="on: config.notify_conquest == 1" v-on="click: applyConfig('notify_conquest', 1)">Trước 5 phút</span><span v-class="on: config.notify_conquest == 2" v-on="click: applyConfig('notify_conquest', 2)">Trước 2 phút</span><span v-class="on: config.notify_conquest == 3" v-on="click: applyConfig('notify_conquest', 3)">Trước 30 phút</span><span v-class="on: config.notify_conquest == 4" v-on="click: applyConfig('notify_conquest', 4)">Khi kết thúc</span></div>
-              <div class="desc">Nhắc nhở khi kết thúc viễn chinh</div>
-            </li>
-            <li>
-              <div class="act">2. Nhắc nhở dưỡng thương<span v-class="on: config.notify_repair == 0" v-on="click: applyConfig('notify_repair', 0)">Tắt</span><span v-class="on: config.notify_repair == 1" v-on="click: applyConfig('notify_repair', 1)">Trước 5 phút</span><span v-class="on: config.notify_repair == 2" v-on="click: applyConfig('notify_repair', 2)">Trước 2 phút</span><span v-class="on: config.notify_repair == 3" v-on="click: applyConfig('notify_repair', 3)">Trước 30 phút</span><span v-class="on: config.notify_repair == 4" v-on="click: applyConfig('notify_repair', 4)">Khi kết thúc</span></div>
-              <div class="desc">
-                Nhắc nhở khi dưỡng thương xong
-                * Nếu sử dụng [Thẻ giúp đỡ] thì thông báo vẫn sẽ còn.
-              </div>
-            </li>
-            <li>
-              <div class="act">3. Nhắc nhở tổn thất chiến đấu<span v-class="on: config.notify_broken == 0" v-on="click: applyConfig('notify_broken', 0)">Tắt</span><span v-class="on: config.notify_broken == 1" v-on="click: applyConfig('notify_broken', 1)">Trọng thương</span><span v-class="on: config.notify_broken == 2" v-on="click: applyConfig('notify_broken', 2)">Thương vừa</span><span v-class="on: config.notify_broken == 3" v-on="click: applyConfig('notify_broken', 3)">Thương nhẹ</span><span v-class="on: config.notify_broken == 4" v-on="click: applyConfig('notify_broken', 4)">Mất máu</span><span v-class="on: config.notify_broken == 5" v-on="click: applyConfig('notify_broken', 5)">Rớt troop</span></div>
-              <div class="desc">Nhắc nhở khi bị tổn thương trong chiến đấu.</div>
-              <div class="desc">Cấp độ nhắc nhở sẽ bao gồm cả bậc dưới, ví dụ chọn mất troop thì dù mất máu hay thương nhẹ đều sẽ hiện nhắc nhở.</div>
-            </li>
-            <li>
-              <div class="act">4. Nhắc nhở kiếm rớt<span v-class="on: config.notify_getnew == 0" v-on="click: applyConfig('notify_getnew', 0)">Tắt</span><span v-class="on: config.notify_getnew == 1" v-on="click: applyConfig('notify_getnew', 1)">Saniwa châu Á</span><span v-class="on: config.notify_getnew == 2" v-on="click: applyConfig('notify_getnew', 2)">Saniwa châu Âu</span><span v-class="on: config.notify_getnew == 3" v-on="click: applyConfig('notify_getnew', 3)">Saniwa châu Phi</span></div>
-              <div class="desc">Nhắc nhở khi có kiếm rớt.</div>
-              <div class="desc">Châu Âu: Kiếm 5 cánh hoa, Kiếm ở boss, Kiếm ở event.</div>
-              <div class="desc">Châu Á: Kiếm hiếm.</div>
-              <div class="desc">Châu Phi: Toàn bộ kiếm.</div>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <!-- 设置-->
-      <div v-show="tab==-2">
-        <div class="panel-about">
-          <div class="t">审神忙 · Touken Ranbu Helper</div>
-          <ul class="sl">
-            <li>
-              <div class="desc">Version： 1.4.16 (Pocket)</div>
-              <div class="desc">Update： Tue Aug 28 2019 00:00:00 GMT+0700 (Vietnam Standard Time)</div>
-              <div class="desc">Project：<a href="https://github.com/hitomi/tohken">https://github.com/hitomi/tohken</a></div>
-              <div class="desc">Việt hóa： <a href="https://www.facebook.com/toukenranbu.vn/">Touken Ranbu Vietnam</a></div>
-			  ----------------------------------------------------------------
-			  <div class="desc">Bản edit mới: update Yari kiwame (2019) 
-			  <div class="desc">Nguồn: 耶薇亦葵@刀剑乱舞贴吧 / 黎浮@新浪微博</div>
-			  <div class="desc">Edit Kiwame： Yuki @ <a href="https://www.facebook.com/groups/toukenranbuvietnamgroup/">Touken Ranbu Vietnam Group</a></div>
-			  <div class="desc">Edit 2: Phạm Dương @ <a href="https://www.facebook.com/d.naytion/"></a></div>
-			  <div class="desc">Bản edit mới có tham khảo thêm bản dịch trên： <a href="http://vi.touken-ranbu.wikia.com/wiki/Wikia_Touken_Ranbu">Touken Ranbu Wikia Việt</a></div>							  			  			  			  
-              <div class="desc">27/11/2018 Buzen Gou</div>	
-              <div class="desc">18/12/2018 Nenekirimaru</div>	
-              <div class="desc">10/03/2019 Hakusan Yoshimitsu</div>	
-			  <div class="desc">24/04/2019 Hizen/Chouson</div>		
-			  <div class="desc">30/07/2019 Chatannakiri</div>
-			  <div class="desc">24/09/2019 Kuwana Gou</div>
-			  <div class="desc">19/11/2019 Minamoto/Suishinshi</div>
-			  <div class="desc">10/12/2019 Matsui Gou</div>
-	        </li>
-          </ul>
-        </div>
-        <div class="panel-about">
-          <div class="t">STAFF</div>
-          <ul class="sl">
-            <li>
-              <div class="act">攻城狮</div>
-              <div class="desc">求助攻！求一起战斗！</div>
-              <div class="desc"><a href="http://weibo.com/moelynn" target="_blank">@毫无存在感的凌</a></div>
-              <div class="desc"><a href="https://weibo.com/u/5381086937" target="_blank">@黎浮_</a></div>
-            </li>
-            <li>
-              <div class="act">攻略组</div>
-              <div class="desc">各位测试组成员天天帮忙踩坑跑图拿数据和抓虫OwO，超辛苦的！万分感谢！！没有你们就没法这么快的把新版本坑出来！</div>
-              <div class="desc"><a href="http://weibo.com/NKSan" target="_blank">@1tuka</a></div>
-              <div class="desc"><a href="http://weibo.com/u/2206048461" target="_blank">@生亦求喂食</a></div>
-              <div class="desc"><a href="http://weibo.com/sr34v5" target="_blank">@Rabbit_仙鹤归家w</a></div>
-              <div class="desc"><a href="http://weibo.com/moyuchaoren" target="_blank">@茈予-安详地舔舔舔</a></div>
-              <div class="desc"><a href="http://weibo.com/koei327" target="_blank">@常暗_PETY亚洲善待山姥切国広组</a></div>
-            </li>
-            <li>
-              <div class="act">感谢</div>
-              <div class="desc">赞助商</div>
-              <div class="desc"><a href="http://weibo.com/erhuomiao" target="_blank">喵的二货小店</a></div>
-              <div class="desc">刀纹和资料</div>
-              <div class="desc"><a href="http://wikiwiki.jp/toulove" target="_blank">Toulove</a></div>
-              <div class="desc">帮咱解读了不少百科上的内容（咱日语废）</div>
-              <div class="desc"><a href="http://weibo.com/huihuiowo" target="_blank">@幸好我长的帅</a></div>
-              <div class="desc">前期测试协助，另外戳过去能看到会动可以戳还会说话的Live2D动态壁纸哦！</div>
-              <div class="desc"><a href="http://weibo.com/546246695" target="_blank">@高庄主-蹲等魔界战记5</a></div>
-            </li>
-          </ul>
-        </div>
-        <div class="panel-about">
-          <div class="t">目前已知BUG</div>
-          <ul class="sl">
-            <li>
-              <div class="act">手入时使用手伝い札时提醒不会消失</div>
-              <div class="act">小判数量不会变化</div>
-              <div class="act">界面特别窄时字会堆在一起</div>
-            </li>
-          </ul>
-        </div>
-        <div class="panel-about">
-          <div class="t">更新公告</div>
-          <ul class="sl">
-            <li>
-              <div class="act">v0.2.0 150315</div>
-              <div class="desc">* 远征提醒修复</div>
-              <div class="desc">+ 手入提醒</div>
-              <div class="desc">+ 疲劳演算</div>
-              <div class="desc">+ 刀装汇总</div>
-              <div class="desc">+ 锻刀和掉落统计</div>
-            </li>
-            <li>
-              <div class="act">v0.1.3 150304</div>
-              <div class="desc">* 更完善的修复了提醒失效问题(感谢微博<a href="http://weibo.com/moyuchaoren" target="_blank">@茈予-安详地舔舔舔</a>提供的错误报告截图，感谢<a href="http://weibo.com/koei327" target="_blank">@常暗_PETY亚洲善待山姥切国広组</a>进行测试汇报)</div>
-              <div class="desc">追加平均等级和等级总和的显示功能，等级总和在鼠标悬停在平均等级上时会出现(微博<a href="http://weibo.com/NKSan" target="_blank">@1tuka</a>)</div>
-            </li>
-            <li>
-              <div class="act">v0.1.2 150304</div>
-              <div class="desc">紧急修复提醒失效问题(微博<a href="http://weibo.com/moyuchaoren" target="_blank">@茈予-安详地舔舔舔</a>)</div>
-            </li>
-            <li>
-              <div class="act">v0.1.1 150304</div>
-              <div class="desc">修正了99级时的显示问题(来自贴吧@catofsickle)</div>
-              <div class="desc">追加设置页面，可以开启和关闭部分提醒功能</div>
-              <div class="desc">增加战斗过程中的爆刀剧透功能，请在设置页面中手工开启(微博<a href="http://weibo.com/60046002" target="_blank">@天見禎芽-目指立派前野厨</a>)</div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <script src="../../thirdparty/FileSaver.js"></script>
-    <script src="../../thirdparty/lodash.js"></script>
-    <script src="../../thirdparty/jquery.js"></script>
-    <script src="../../thirdparty/vue.js"></script>
-    <script src="../../thirdparty/aes.js"></script>
-    <script src="../../thirdparty/pad-nopadding-min.js"></script>
-    <script src="./app/define.js"></script>
-    <script src="./app/data.js"></script>
-    <script src="./app/config.js"></script>
-    <script src="./app/store.js"></script>
-    <script src="./app/event.js"></script>
-    <script src="./app/parse.js"></script>
-    <script src="./app/router.js"></script>
-    <script src="./app/view.js"></script>
-    <script src="./app/app.js"></script>
-  </body>
+	<head>
+		<title>Touken Ranbu</title>
+		<link href="style.css" rel="stylesheet" type="text/css">
+		<script src="tablesort.js"></script>
+		<script src="define.js"></script>
+		<script src="stats.js"></script>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<div>
+			<textarea type="text" id="input">
+{"sword":{"82529836":{"serial_id":"82529836","sword_id":"3","symbol":"0","rarity":"5","level":"1","exp":"0","evol_num":"0","hp":"50","hp_max":"50","atk":"50","def":"52","mobile":"31","back":"40","scout":"29","hide":"29","hp_up":"7","atk_up":"16","def_up":"14","mobile_up":"0","back_up":"9","scout_up":"3","hide_up":"0","loyalties":"30","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-03-31 06:27:38","created_at":"2016-03-31 06:27:38"},"64932919":{"serial_id":"64932919","sword_id":"3","symbol":"1","rarity":"5","level":"99","exp":"1985672","evol_num":"1","hp":"56","hp_max":"56","atk":"72","def":"72","mobile":"37","back":"55","scout":"35","hide":"35","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"30","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-30 00:22:05","created_at":"2015-12-17 11:40:32"},"70523694":{"serial_id":"70523694","sword_id":"5","symbol":"1","rarity":"3","level":"25","exp":"58470","evol_num":"1","hp":"50","hp_max":"50","atk":"53","def":"54","mobile":"41","back":"43","scout":"36","hide":"30","hp_up":"8","atk_up":"15","def_up":"15","mobile_up":"0","back_up":"10","scout_up":"2","hide_up":"0","loyalties":"28","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:49:38","created_at":"2016-01-23 23:27:07"},"62974476":{"serial_id":"62974476","sword_id":"5","symbol":"1","rarity":"3","level":"99","exp":"1928334","evol_num":"1","hp":"52","hp_max":"52","atk":"68","def":"69","mobile":"41","back":"53","scout":"37","hide":"30","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"28","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-02-18 01:48:29","created_at":"2015-11-28 21:42:41"},"82529837":{"serial_id":"82529837","sword_id":"5","symbol":"0","rarity":"3","level":"1","exp":"0","evol_num":"0","hp":"44","hp_max":"44","atk":"47","def":"48","mobile":"35","back":"37","scout":"30","hide":"24","hp_up":"8","atk_up":"15","def_up":"15","mobile_up":"0","back_up":"10","scout_up":"2","hide_up":"0","loyalties":"28","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-03-31 06:27:38","created_at":"2016-03-31 06:27:38"},"57530804":{"serial_id":"57530804","sword_id":"7","symbol":"1","rarity":"3","level":"99","exp":"2923984","evol_num":"1","hp":"63","hp_max":"63","atk":"85","def":"68","mobile":"13","back":"61","scout":"13","hide":"23","hp_up":"9","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"32","fatigue":"69","equip_serial_id1":"42533121","equip_serial_id2":"34177299","equip_serial_id3":null,"horse_serial_id":"26800190","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:43:59","created_at":"2015-10-16 11:38:07"},"57366111":{"serial_id":"57366111","sword_id":"9","symbol":"1","rarity":"3","level":"99","exp":"4742255","evol_num":"1","hp":"58","hp_max":"58","atk":"68","def":"51","mobile":"42","back":"61","scout":"40","hide":"35","hp_up":"2","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"29","fatigue":"52","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:40:38","created_at":"2015-10-14 23:00:31"},"95604110":{"serial_id":"95604110","sword_id":"11","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"26","hp_max":"26","atk":"13","def":"26","mobile":"27","back":"17","scout":"35","hide":"36","hp_up":"3","atk_up":"9","def_up":"8","mobile_up":"27","back_up":"10","scout_up":"10","hide_up":"0","loyalties":"45","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-19 01:26:23","created_at":"2016-06-19 01:26:23"},"95713964":{"serial_id":"95713964","sword_id":"11","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"26","hp_max":"26","atk":"13","def":"26","mobile":"27","back":"17","scout":"35","hide":"36","hp_up":"3","atk_up":"9","def_up":"8","mobile_up":"27","back_up":"10","scout_up":"10","hide_up":"0","loyalties":"45","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-20 02:34:02","created_at":"2016-06-20 02:34:02"},"56546825":{"serial_id":"56546825","sword_id":"12","symbol":"2","rarity":"2","level":"35","exp":1352634,"evol_num":"0","hp":"41","hp_max":"41","atk":"80","def":"82","mobile":"142","back":"35","scout":"102","hide":"109","hp_up":"9","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"18","hide_up":"0","loyalties":"60","fatigue":100,"equip_serial_id1":"44635484","equip_serial_id2":"44636528","equip_serial_id3":null,"horse_serial_id":"29653640","item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2015-10-09 18:28:13"},"79162535":{"serial_id":"79162535","sword_id":"17","symbol":"1","rarity":"5","level":"43","exp":209277,"evol_num":"1","hp":"56","hp_max":"56","atk":"62","def":"78","mobile":"38","back":"52","scout":"31","hide":"30","hp_up":"15","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"29","fatigue":41,"equip_serial_id1":"43303826","equip_serial_id2":"44054433","equip_serial_id3":"43131042","horse_serial_id":"26035833","item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2016-03-18 17:07:17"},"56555168":{"serial_id":"56555168","sword_id":"19","symbol":"1","rarity":"2","level":"99","exp":"1957171","evol_num":"1","hp":"36","hp_max":"36","atk":"44","def":"46","mobile":"52","back":"41","scout":"47","hide":"45","hp_up":"3","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"64","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:40:38","created_at":"2015-10-09 19:18:10"},"57401442":{"serial_id":"57401442","sword_id":"25","symbol":"1","rarity":"4","level":"99","exp":"2619297","evol_num":"1","hp":"54","hp_max":"54","atk":"70","def":"72","mobile":"36","back":"57","scout":"37","hide":"31","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"30","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-01-06 23:22:17","created_at":"2015-10-15 08:55:51"},"56569456":{"serial_id":"56569456","sword_id":"27","symbol":"1","rarity":"2","level":"99","exp":"2191584","evol_num":"1","hp":"32","hp_max":"32","atk":"45","def":"45","mobile":"48","back":"40","scout":"51","hide":"46","hp_up":"3","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"47","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 11:24:45","created_at":"2015-10-09 20:34:45"},"56987349":{"serial_id":"56987349","sword_id":"29","symbol":"1","rarity":"2","level":"99","exp":"2275462","evol_num":"1","hp":"41","hp_max":"41","atk":"47","def":"48","mobile":"54","back":"36","scout":"46","hide":"43","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"49","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 11:24:45","created_at":"2015-10-12 04:27:56"},"70277739":{"serial_id":"70277739","sword_id":"31","symbol":"1","rarity":"1","level":53,"exp":332468,"evol_num":"1","hp":"34","hp_max":"34","atk":"32","def":"45","mobile":"56","back":"30","scout":"40","hide":"38","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"8","hide_up":"0","loyalties":"37","fatigue":41,"equip_serial_id1":"44970516","equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2016-01-22 16:11:52"},"60226156":{"serial_id":"60226156","sword_id":"33","symbol":"1","rarity":"1","level":"94","exp":"1478604","evol_num":"1","hp":"36","hp_max":"36","atk":"32","def":"42","mobile":"58","back":"30","scout":"42","hide":"38","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"5","hide_up":"0","loyalties":"35","fatigue":"80","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-06-28 13:56:04","created_at":"2015-11-11 03:55:11"},"61349369":{"serial_id":"61349369","sword_id":"35","symbol":"1","rarity":"1","level":"93","exp":"1402212","evol_num":"1","hp":"37","hp_max":"37","atk":"35","def":"44","mobile":"49","back":"38","scout":"44","hide":"38","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"7","hide_up":"0","loyalties":"37","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 14:04:11","created_at":"2015-11-20 15:15:28"},"85066537":{"serial_id":"85066537","sword_id":"37","symbol":"1","rarity":"1","level":"22","exp":"42722","evol_num":"1","hp":"33","hp_max":"33","atk":"20","def":"32","mobile":"30","back":"25","scout":"39","hide":"44","hp_up":"5","atk_up":"7","def_up":"12","mobile_up":"21","back_up":"5","scout_up":"13","hide_up":"0","loyalties":"35","fatigue":49,"equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":0,"recovered_at":"2016-07-06 22:29:18","created_at":"2016-04-15 00:39:15"},"95713288":{"serial_id":"95713288","sword_id":"39","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"29","hp_max":"29","atk":"18","def":"28","mobile":"23","back":"14","scout":"34","hide":"34","hp_up":"3","atk_up":"9","def_up":"9","mobile_up":"25","back_up":"12","scout_up":"10","hide_up":"0","loyalties":"37","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-20 02:10:33","created_at":"2016-06-20 02:10:33"},"95604112":{"serial_id":"95604112","sword_id":"39","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"29","hp_max":"29","atk":"18","def":"28","mobile":"23","back":"14","scout":"34","hide":"34","hp_up":"3","atk_up":"9","def_up":"9","mobile_up":"25","back_up":"12","scout_up":"10","hide_up":"0","loyalties":"37","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-19 01:26:23","created_at":"2016-06-19 01:26:23"},"70277428":{"serial_id":"70277428","sword_id":"39","symbol":"1","rarity":"1","level":53,"exp":331660,"evol_num":"1","hp":"35","hp_max":"35","atk":"31","def":"41","mobile":"52","back":"30","scout":"39","hide":"38","hp_up":"1","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"9","hide_up":"0","loyalties":"37","fatigue":41,"equip_serial_id1":"42597729","equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2016-01-22 16:08:08"},"97407426":{"serial_id":"97407426","sword_id":"41","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"15","def":"29","mobile":"24","back":"18","scout":"34","hide":"34","hp_up":"2","atk_up":"11","def_up":"9","mobile_up":"24","back_up":"11","scout_up":"8","hide_up":"0","loyalties":"38","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 15:00:05","created_at":"2016-07-06 15:00:05"},"97405584":{"serial_id":"97405584","sword_id":"41","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"15","def":"29","mobile":"24","back":"18","scout":"34","hide":"34","hp_up":"2","atk_up":"11","def_up":"9","mobile_up":"24","back_up":"11","scout_up":"8","hide_up":"0","loyalties":"38","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:39:49","created_at":"2016-07-06 14:39:49"},"70392972":{"serial_id":"70392972","sword_id":"43","symbol":"1","rarity":"1","level":"75","exp":780599,"evol_num":"1","hp":"35","hp_max":"35","atk":"30","def":"38","mobile":"64","back":"31","scout":"39","hide":"38","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"19","hide_up":"0","loyalties":"33","fatigue":32,"equip_serial_id1":"44949066","equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2016-01-23 08:12:35"},"95604114":{"serial_id":"95604114","sword_id":"45","symbol":"0","rarity":"1","level":"5","exp":"1500","evol_num":"0","hp":"28","hp_max":"28","atk":"18","def":"25","mobile":"25","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"9","def_up":"11","mobile_up":"26","back_up":"9","scout_up":"10","hide_up":"0","loyalties":"35","fatigue":"39","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:36:32","created_at":"2016-06-19 01:26:24"},"97412177":{"serial_id":"97412177","sword_id":"45","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"28","hp_max":"28","atk":"18","def":"25","mobile":"25","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"9","def_up":"11","mobile_up":"26","back_up":"9","scout_up":"10","hide_up":"0","loyalties":"35","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 15:53:04","created_at":"2016-07-06 15:53:04"},"97405321":{"serial_id":"97405321","sword_id":"45","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"28","hp_max":"28","atk":"18","def":"25","mobile":"25","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"9","def_up":"11","mobile_up":"26","back_up":"9","scout_up":"10","hide_up":"0","loyalties":"35","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:36:32","created_at":"2016-07-06 14:36:32"},"95604115":{"serial_id":"95604115","sword_id":"45","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"28","hp_max":"28","atk":"18","def":"25","mobile":"25","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"9","def_up":"11","mobile_up":"26","back_up":"9","scout_up":"10","hide_up":"0","loyalties":"35","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-19 01:26:24","created_at":"2016-06-19 01:26:24"},"56546052":{"serial_id":"56546052","sword_id":"46","symbol":"2","rarity":"2","level":"35","exp":"1458842","evol_num":"0","hp":"48","hp_max":"48","atk":"86","def":"76","mobile":"138","back":"38","scout":"97","hide":"105","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"17","hide_up":"0","loyalties":"58","fatigue":"90","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":"30521870","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 12:51:08","created_at":"2015-10-09 18:23:05"},"56549463":{"serial_id":"56549463","sword_id":"49","symbol":"1","rarity":"1","level":"93","exp":"1445482","evol_num":"1","hp":"32","hp_max":"32","atk":"28","def":"42","mobile":"53","back":"31","scout":"42","hide":"39","hp_up":"2","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"5","hide_up":"0","loyalties":"40","fatigue":"81","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 13:56:04","created_at":"2015-10-09 18:45:16"},"95711091":{"serial_id":"95711091","sword_id":"49","symbol":"0","rarity":"1","level":"5","exp":"1500","evol_num":"0","hp":"27","hp_max":"27","atk":"14","def":"29","mobile":"23","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"10","def_up":"9","mobile_up":"26","back_up":"10","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"39","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:36:32","created_at":"2016-06-20 01:22:13"},"97406148":{"serial_id":"97406148","sword_id":"49","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"14","def":"29","mobile":"23","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"10","def_up":"9","mobile_up":"26","back_up":"10","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:45:43","created_at":"2016-07-06 14:45:43"},"95712067":{"serial_id":"95712067","sword_id":"49","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"14","def":"29","mobile":"23","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"10","def_up":"9","mobile_up":"26","back_up":"10","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-20 01:41:05","created_at":"2016-06-20 01:41:05"},"95712190":{"serial_id":"95712190","sword_id":"49","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"14","def":"29","mobile":"23","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"10","def_up":"9","mobile_up":"26","back_up":"10","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-20 01:43:07","created_at":"2016-06-20 01:43:07"},"95604929":{"serial_id":"95604929","sword_id":"49","symbol":"0","rarity":"1","level":"1","exp":"0","evol_num":"0","hp":"27","hp_max":"27","atk":"14","def":"29","mobile":"23","back":"17","scout":"35","hide":"35","hp_up":"3","atk_up":"10","def_up":"9","mobile_up":"26","back_up":"10","scout_up":"8","hide_up":"0","loyalties":"40","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-19 01:35:39","created_at":"2016-06-19 01:35:39"},"91708983":{"serial_id":"91708983","sword_id":"55","symbol":"0","rarity":"4","level":"1","exp":"0","evol_num":"0","hp":"50","hp_max":"50","atk":"65","def":"63","mobile":"31","back":"49","scout":"30","hide":"27","hp_up":"8","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"28","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-05-22 08:28:54","created_at":"2016-05-22 08:28:54"},"64738581":{"serial_id":"64738581","sword_id":"55","symbol":"1","rarity":"4","level":"97","exp":"1757000","evol_num":"1","hp":"57","hp_max":"57","atk":"71","def":"69","mobile":"37","back":"55","scout":"37","hide":"33","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"28","fatigue":"56","equip_serial_id1":"43372828","equip_serial_id2":"42936356","equip_serial_id3":"43372851","horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:40:19","created_at":"2015-12-15 21:05:10"},"63678534":{"serial_id":"63678534","sword_id":"55","symbol":"1","rarity":"4","level":"99","exp":"1931364","evol_num":"1","hp":"64","hp_max":"64","atk":"71","def":"69","mobile":"37","back":"55","scout":"38","hide":"33","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"0","hide_up":"0","loyalties":"28","fatigue":"52","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 14:09:37","created_at":"2015-12-04 17:58:59"},"63525479":{"serial_id":"63525479","sword_id":"57","symbol":"1","rarity":"3","level":"99","exp":"1929900","evol_num":"1","hp":"48","hp_max":"48","atk":"63","def":"67","mobile":"49","back":"47","scout":"41","hide":"36","hp_up":"8","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"0","hide_up":"0","loyalties":"26","fatigue":"73","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-27 08:54:51","created_at":"2015-12-03 02:44:59"},"95238187":{"serial_id":"95238187","sword_id":"59","symbol":"1","rarity":"4","level":41,"exp":184960,"evol_num":"1","hp":60,"hp_max":"63","atk":"81","def":"74","mobile":"18","back":"60","scout":"17","hide":"28","hp_up":"10","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"29","fatigue":100,"equip_serial_id1":"44827402","equip_serial_id2":"45271312","equip_serial_id3":"44635417","horse_serial_id":"25847566","item_id":null,"protect":"1","status":"0","recovered_at":"2016-07-06 22:40:30","created_at":"2016-06-15 15:38:06"},"60459513":{"serial_id":"60459513","sword_id":"65","symbol":"1","rarity":"3","level":"99","exp":"2166501","evol_num":"1","hp":"67","hp_max":"67","atk":"76","def":"63","mobile":"27","back":"63","scout":"17","hide":"33","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"30","fatigue":"49","equip_serial_id1":"39891265","equip_serial_id2":"44949068","equip_serial_id3":null,"horse_serial_id":"40030039","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:43:59","created_at":"2015-11-14 03:05:03"},"73930910":{"serial_id":"73930910","sword_id":"67","symbol":"1","rarity":"2","level":"99","exp":"1931012","evol_num":"1","hp":"40","hp_max":"40","atk":"41","def":"60","mobile":"53","back":"53","scout":"45","hide":"30","hp_up":"8","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"6","hide_up":"0","loyalties":"50","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 11:26:59","created_at":"2016-02-19 00:20:01"},"57288651":{"serial_id":"57288651","sword_id":"73","symbol":"1","rarity":"3","level":"99","exp":"1929396","evol_num":"1","hp":"59","hp_max":"59","atk":"73","def":"72","mobile":"34","back":"53","scout":"34","hide":"30","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"30","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-02-02 23:45:01","created_at":"2015-10-14 10:52:57"},"57205928":{"serial_id":"57205928","sword_id":"79","symbol":"1","rarity":"4","level":"99","exp":"2053020","evol_num":"1","hp":"57","hp_max":"57","atk":"72","def":"70","mobile":"37","back":"57","scout":"33","hide":"32","hp_up":"8","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"30","fatigue":"31","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-27 08:55:06","created_at":"2015-10-13 19:20:14"},"56575394":{"serial_id":"56575394","sword_id":"81","symbol":"1","rarity":"2","level":"68","exp":"604463","evol_num":"1","hp":"37","hp_max":"37","atk":"53","def":"47","mobile":"46","back":"49","scout":"38","hide":"39","hp_up":"5","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"30","fatigue":"46","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:51:24","created_at":"2015-10-09 21:03:21"},"56548846":{"serial_id":"56548846","sword_id":"83","symbol":"1","rarity":"1","level":"94","exp":"1511961","evol_num":"1","hp":"39","hp_max":"39","atk":"33","def":"44","mobile":"49","back":"30","scout":"40","hide":"39","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"7","hide_up":"0","loyalties":"42","fatigue":"69","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 13:56:04","created_at":"2015-10-09 18:41:20"},"56458889":{"serial_id":"56458889","sword_id":"85","symbol":"1","rarity":"2","level":"99","exp":"2115424","evol_num":"1","hp":"43","hp_max":"43","atk":"55","def":"50","mobile":"51","back":"50","scout":"46","hide":"42","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"0","hide_up":"0","loyalties":"41","fatigue":"51","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 12:51:08","created_at":"2015-10-08 21:49:07"},"66281093":{"serial_id":"66281093","sword_id":"87","symbol":"1","rarity":"2","level":"99","exp":"1934459","evol_num":"1","hp":"43","hp_max":"43","atk":"56","def":"50","mobile":"49","back":"49","scout":"39","hide":"39","hp_up":"4","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"38","fatigue":"43","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-04-29 00:51:56","created_at":"2015-12-30 13:26:09"},"56697557":{"serial_id":"56697557","sword_id":"89","symbol":"1","rarity":"2","level":"99","exp":"1937278","evol_num":"1","hp":"40","hp_max":"40","atk":"59","def":"50","mobile":"50","back":"51","scout":"41","hide":"39","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"1","hide_up":"0","loyalties":"30","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:49:38","created_at":"2015-10-10 14:50:01"},"57172273":{"serial_id":"57172273","sword_id":"91","symbol":"1","rarity":"3","level":"99","exp":"3110711","evol_num":"1","hp":"57","hp_max":"57","atk":"70","def":"69","mobile":"36","back":"56","scout":"36","hide":"31","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"35","fatigue":"55","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 12:51:08","created_at":"2015-10-13 13:41:40"},"97405694":{"serial_id":"97405694","sword_id":"93","symbol":"0","rarity":"2","level":"1","exp":"0","evol_num":"0","hp":"36","hp_max":"36","atk":"40","def":"34","mobile":"33","back":"28","scout":"35","hide":"35","hp_up":"6","atk_up":"16","def_up":"8","mobile_up":"9","back_up":"20","scout_up":"4","hide_up":"0","loyalties":"34","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:41:08","created_at":"2016-07-06 14:41:08"},"97405936":{"serial_id":"97405936","sword_id":"93","symbol":"0","rarity":"2","level":"1","exp":"0","evol_num":"0","hp":"36","hp_max":"36","atk":"40","def":"34","mobile":"33","back":"28","scout":"35","hide":"35","hp_up":"6","atk_up":"16","def_up":"8","mobile_up":"9","back_up":"20","scout_up":"4","hide_up":"0","loyalties":"34","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 14:43:21","created_at":"2016-07-06 14:43:21"},"56679209":{"serial_id":"56679209","sword_id":"93","symbol":"1","rarity":"2","level":"99","exp":"1968245","evol_num":"1","hp":"41","hp_max":"41","atk":"61","def":"47","mobile":"47","back":"53","scout":"41","hide":"40","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"34","fatigue":"46","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-05-24 19:55:21","created_at":"2015-10-10 12:47:31"},"97412720":{"serial_id":"97412720","sword_id":"97","symbol":"0","rarity":"3","level":"1","exp":"0","evol_num":"0","hp":"51","hp_max":"51","atk":"51","def":"45","mobile":"31","back":"36","scout":"25","hide":"24","hp_up":"7","atk_up":"15","def_up":"15","mobile_up":"0","back_up":"10","scout_up":"3","hide_up":"0","loyalties":"28","fatigue":"40","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-07-06 15:57:53","created_at":"2016-07-06 15:57:53"},"56554230":{"serial_id":"56554230","sword_id":"99","symbol":"1","rarity":"2","level":"99","exp":"2207489","evol_num":"1","hp":"37","hp_max":"37","atk":"47","def":"43","mobile":"50","back":"36","scout":"47","hide":"46","hp_up":"0","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"6","hide_up":"0","loyalties":"45","fatigue":"92","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 11:24:45","created_at":"2015-10-09 19:13:00"},"58460146":{"serial_id":"58460146","sword_id":"103","symbol":"1","rarity":"2","level":"99","exp":"2198123","evol_num":"1","hp":"39","hp_max":"39","atk":"44","def":"50","mobile":"42","back":"47","scout":"51","hide":"39","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"40","fatigue":"51","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 11:24:45","created_at":"2015-10-24 01:21:36"},"62608607":{"serial_id":"62608607","sword_id":"105","symbol":"1","rarity":"2","level":"99","exp":"2195927","evol_num":"1","hp":"51","hp_max":"51","atk":"68","def":"53","mobile":"42","back":"56","scout":"40","hide":"39","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"30","fatigue":"100","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-25 12:51:08","created_at":"2015-11-26 08:56:29"},"68672001":{"serial_id":"68672001","sword_id":"110","symbol":"1","rarity":"4","level":"99","exp":"1946209","evol_num":"0","hp":"54","hp_max":"54","atk":"70","def":"70","mobile":"38","back":"55","scout":"39","hide":"26","hp_up":"2","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"38","fatigue":"90","equip_serial_id1":"42936323","equip_serial_id2":"42936355","equip_serial_id3":"35378222","horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-27 01:22:40","created_at":"2016-01-11 22:20:04"},"95248247":{"serial_id":"95248247","sword_id":"112","symbol":"0","rarity":"2","level":"3","exp":"540","evol_num":"0","hp":"48","hp_max":"48","atk":"48","def":"45","mobile":"33","back":"38","scout":"23","hide":"30","hp_up":"3","atk_up":"12","def_up":"15","mobile_up":"5","back_up":"11","scout_up":"4","hide_up":"0","loyalties":"32","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"0","status":"0","recovered_at":"2016-06-18 23:51:01","created_at":"2016-06-15 18:03:53"},"67030533":{"serial_id":"67030533","sword_id":"114","symbol":"1","rarity":"4","level":"99","exp":"1958791","evol_num":"0","hp":"53","hp_max":"53","atk":"69","def":"69","mobile":"51","back":"54","scout":"25","hide":"37","hp_up":"3","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"36","fatigue":"94","equip_serial_id1":"43372838","equip_serial_id2":"43372893","equip_serial_id3":"42680007","horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-27 01:22:40","created_at":"2016-01-04 03:34:50"},"56841623":{"serial_id":"56841623","sword_id":"118","symbol":"1","rarity":"2","level":"68","exp":"604184","evol_num":"1","hp":"45","hp_max":"45","atk":"61","def":"48","mobile":"57","back":"54","scout":"38","hide":"38","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"5","hide_up":"0","loyalties":"33","fatigue":"46","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:51:24","created_at":"2015-10-11 11:13:47"},"74462915":{"serial_id":"74462915","sword_id":"120","symbol":"1","rarity":"1","level":"34","exp":"119300","evol_num":"1","hp":"32","hp_max":"32","atk":"34","def":"40","mobile":"55","back":"33","scout":"38","hide":"37","hp_up":"4","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"11","hide_up":"0","loyalties":"42","fatigue":"49","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:52:13","created_at":"2016-02-22 01:17:38"},"58530131":{"serial_id":"58530131","sword_id":"122","symbol":"1","rarity":"3","level":"99","exp":"1988158","evol_num":"1","hp":"51","hp_max":"51","atk":"66","def":"72","mobile":"37","back":"56","scout":"31","hide":"31","hp_up":"8","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"28","fatigue":"46","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-23 20:49:05","created_at":"2015-10-24 17:14:46"},"57368916":{"serial_id":"57368916","sword_id":"128","symbol":"1","rarity":"3","level":"97","exp":"1795631","evol_num":"1","hp":"49","hp_max":"49","atk":"69","def":"65","mobile":"33","back":"55","scout":"33","hide":"28","hp_up":"7","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"3","hide_up":"0","loyalties":"30","fatigue":"100","equip_serial_id1":"44636248","equip_serial_id2":"44636446","equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:39:33","created_at":"2015-10-14 23:14:36"},"60880136":{"serial_id":"60880136","sword_id":"130","symbol":"1","rarity":"4","level":"99","exp":"2610526","evol_num":"1","hp":"56","hp_max":"56","atk":"69","def":"69","mobile":"34","back":"51","scout":"33","hide":"29","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"0","hide_up":"0","loyalties":"32","fatigue":"90","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-27 01:22:40","created_at":"2015-11-18 01:44:48"},"57401321":{"serial_id":"57401321","sword_id":"132","symbol":"1","rarity":"3","level":"99","exp":"3192730","evol_num":"1","hp":"67","hp_max":"67","atk":"82","def":"77","mobile":"17","back":"61","scout":"18","hide":"31","hp_up":"9","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"2","hide_up":"0","loyalties":"26","fatigue":"100","equip_serial_id1":"30523927","equip_serial_id2":"43372814","equip_serial_id3":null,"horse_serial_id":"26342051","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:43:59","created_at":"2015-10-15 08:53:32"},"58607598":{"serial_id":"58607598","sword_id":"134","symbol":"1","rarity":"3","level":"99","exp":"2255330","evol_num":"1","hp":"62","hp_max":"62","atk":"84","def":"80","mobile":"16","back":"58","scout":"18","hide":"35","hp_up":"10","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"0","hide_up":"0","loyalties":"23","fatigue":"100","equip_serial_id1":"34138662","equip_serial_id2":"29312895","equip_serial_id3":null,"horse_serial_id":"25814739","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:43:59","created_at":"2015-10-25 04:27:25"},"67289430":{"serial_id":"67289430","sword_id":"136","symbol":"1","rarity":"4","level":"99","exp":"1985739","evol_num":"1","hp":"62","hp_max":"62","atk":"72","def":"50","mobile":"51","back":"64","scout":"16","hide":"33","hp_up":"4","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"9","hide_up":"0","loyalties":"34","fatigue":"90","equip_serial_id1":"42936353","equip_serial_id2":"43372837","equip_serial_id3":"42936384","horse_serial_id":"28365251","item_id":null,"protect":"1","status":"0","recovered_at":"2016-06-28 18:43:59","created_at":"2016-01-05 01:04:47"},"59002333":{"serial_id":"59002333","sword_id":"138","symbol":"1","rarity":"3","level":"99","exp":"2027947","evol_num":"1","hp":"54","hp_max":"54","atk":"69","def":"51","mobile":"42","back":"62","scout":"36","hide":"33","hp_up":"6","atk_up":"0","def_up":"0","mobile_up":"0","back_up":"0","scout_up":"4","hide_up":"0","loyalties":"32","fatigue":"46","equip_serial_id1":null,"equip_serial_id2":null,"equip_serial_id3":null,"horse_serial_id":null,"item_id":null,"protect":"1","status":"3","recovered_at":"2016-07-06 15:51:24","created_at":"2015-10-28 18:18:10"}},"party":{"1":{"party_no":"1","status":"1","party_name":"\u7b2c1\u90e8\u968a","finished_at":null,"slot":{"1":{"serial_id":"95238187"},"2":{"serial_id":"79162535"},"3":{"serial_id":"70277428"},"4":{"serial_id":"70277739"},"5":{"serial_id":"70392972"},"6":{"serial_id":"56546825"}}},"2":{"party_no":"2","status":"2","party_name":"\u7b2c2\u90e8\u968a","finished_at":"2016-07-07 03:52:20","slot":{"1":{"serial_id":"64738581"},"2":{"serial_id":"61349369"},"3":{"serial_id":"60226156"},"4":{"serial_id":null},"5":{"serial_id":null},"6":{"serial_id":null}}},"3":{"party_no":"3","status":"2","party_name":"\u7b2c3\u90e8\u968a","finished_at":"2016-07-07 09:52:31","slot":{"1":{"serial_id":"59002333"},"2":{"serial_id":"56575394"},"3":{"serial_id":"56841623"},"4":{"serial_id":"74462915"},"5":{"serial_id":null},"6":{"serial_id":null}}},"4":{"party_no":"4","status":"2","party_name":"\u7b2c4\u90e8\u968a","finished_at":"2016-07-07 06:50:05","slot":{"1":{"serial_id":"70523694"},"4":{"serial_id":"56555168"},"5":{"serial_id":"56697557"},"6":{"serial_id":"57366111"},"2":{"serial_id":null},"3":{"serial_id":null}}}},"equip":{"25398110":{"serial_id":"25398110","equip_id":"10001","soldier":"0"},"25597149":{"serial_id":"25597149","equip_id":"10002","soldier":"0"},"25814739":{"serial_id":"25814739","equip_id":"10003","soldier":"0"},"25847566":{"serial_id":"25847566","equip_id":"10004","soldier":"0"},"26035833":{"serial_id":"26035833","equip_id":"10005","soldier":"0"},"26342051":{"serial_id":"26342051","equip_id":"10006","soldier":"0"},"26791966":{"serial_id":"26791966","equip_id":"10007","soldier":"0"},"26800190":{"serial_id":"26800190","equip_id":"10008","soldier":"0"},"28295750":{"serial_id":"28295750","equip_id":"11011","soldier":"0"},"28365251":{"serial_id":"28365251","equip_id":"11021","soldier":"0"},"29312895":{"serial_id":"29312895","equip_id":"24","soldier":"1"},"29395647":{"serial_id":"29395647","equip_id":"24","soldier":"12"},"29653640":{"serial_id":"29653640","equip_id":"11031","soldier":"0"},"29759139":{"serial_id":"29759139","equip_id":"24","soldier":"10"},"30521870":{"serial_id":"30521870","equip_id":"11031","soldier":"0"},"30523927":{"serial_id":"30523927","equip_id":"24","soldier":"12"},"32374206":{"serial_id":"32374206","equip_id":"18","soldier":"12"},"33874621":{"serial_id":"33874621","equip_id":"18","soldier":"12"},"34083511":{"serial_id":"34083511","equip_id":"18","soldier":"12"},"34126318":{"serial_id":"34126318","equip_id":"18","soldier":"12"},"34138662":{"serial_id":"34138662","equip_id":"24","soldier":"13"},"34177299":{"serial_id":"34177299","equip_id":"24","soldier":"10"},"34192823":{"serial_id":"34192823","equip_id":"18","soldier":"12"},"34370297":{"serial_id":"34370297","equip_id":"18","soldier":"12"},"34980816":{"serial_id":"34980816","equip_id":"15","soldier":"14"},"35313857":{"serial_id":"35313857","equip_id":"18","soldier":"12"},"35313859":{"serial_id":"35313859","equip_id":"6","soldier":"8"},"35313860":{"serial_id":"35313860","equip_id":"18","soldier":"12"},"35313861":{"serial_id":"35313861","equip_id":"18","soldier":"12"},"35378222":{"serial_id":"35378222","equip_id":"15","soldier":"15"},"35559853":{"serial_id":"35559853","equip_id":"6","soldier":"8"},"35939036":{"serial_id":"35939036","equip_id":"18","soldier":"12"},"36054637":{"serial_id":"36054637","equip_id":"21","soldier":"13"},"36444814":{"serial_id":"36444814","equip_id":"18","soldier":"11"},"36744863":{"serial_id":"36744863","equip_id":"18","soldier":"12"},"37311904":{"serial_id":"37311904","equip_id":"12","soldier":"12"},"38152629":{"serial_id":"38152629","equip_id":"18","soldier":"12"},"38938543":{"serial_id":"38938543","equip_id":"18","soldier":"11"},"39293666":{"serial_id":"39293666","equip_id":"11011","soldier":"0"},"39891265":{"serial_id":"39891265","equip_id":"6","soldier":"8"},"40019857":{"serial_id":"40019857","equip_id":"24","soldier":"13"},"40030039":{"serial_id":"40030039","equip_id":"11021","soldier":"0"},"40736950":{"serial_id":"40736950","equip_id":"18","soldier":"12"},"40775339":{"serial_id":"40775339","equip_id":"18","soldier":"12"},"41025965":{"serial_id":"41025965","equip_id":"18","soldier":"12"},"41849308":{"serial_id":"41849308","equip_id":"18","soldier":"11"},"41902827":{"serial_id":"41902827","equip_id":"6","soldier":"8"},"41910000":{"serial_id":"41910000","equip_id":"24","soldier":"13"},"42533119":{"serial_id":"42533119","equip_id":"6","soldier":"8"},"42533121":{"serial_id":"42533121","equip_id":"24","soldier":"8"},"42597729":{"serial_id":"42597729","equip_id":"9","soldier":"10"},"42679981":{"serial_id":"42679981","equip_id":"12","soldier":"11"},"42679990":{"serial_id":"42679990","equip_id":"3","soldier":"10"},"42680007":{"serial_id":"42680007","equip_id":"15","soldier":"15"},"42836940":{"serial_id":"42836940","equip_id":"18","soldier":"12"},"42936314":{"serial_id":"42936314","equip_id":"15","soldier":"14"},"42936316":{"serial_id":"42936316","equip_id":"24","soldier":"13"},"42936317":{"serial_id":"42936317","equip_id":"15","soldier":"12"},"42936318":{"serial_id":"42936318","equip_id":"21","soldier":"13"},"42936323":{"serial_id":"42936323","equip_id":"15","soldier":"14"},"42936353":{"serial_id":"42936353","equip_id":"6","soldier":"8"},"42936355":{"serial_id":"42936355","equip_id":"15","soldier":"12"},"42936356":{"serial_id":"42936356","equip_id":"21","soldier":"13"},"42936384":{"serial_id":"42936384","equip_id":"6","soldier":"8"},"43056518":{"serial_id":"43056518","equip_id":"18","soldier":"12"},"43131042":{"serial_id":"43131042","equip_id":"18","soldier":"12"},"43231643":{"serial_id":"43231643","equip_id":"18","soldier":"12"},"43303826":{"serial_id":"43303826","equip_id":"18","soldier":"12"},"43372814":{"serial_id":"43372814","equip_id":"24","soldier":"13"},"43372828":{"serial_id":"43372828","equip_id":"21","soldier":"13"},"43372831":{"serial_id":"43372831","equip_id":"12","soldier":"12"},"43372837":{"serial_id":"43372837","equip_id":"6","soldier":"8"},"43372838":{"serial_id":"43372838","equip_id":"15","soldier":"15"},"43372851":{"serial_id":"43372851","equip_id":"21","soldier":"13"},"43372893":{"serial_id":"43372893","equip_id":"15","soldier":"13"},"43372900":{"serial_id":"43372900","equip_id":"12","soldier":"11"},"43372916":{"serial_id":"43372916","equip_id":"6","soldier":"8"},"43448964":{"serial_id":"43448964","equip_id":"18","soldier":"12"},"43530471":{"serial_id":"43530471","equip_id":"18","soldier":"12"},"43895753":{"serial_id":"43895753","equip_id":"18","soldier":"12"},"43895754":{"serial_id":"43895754","equip_id":"18","soldier":"12"},"43895765":{"serial_id":"43895765","equip_id":"18","soldier":"12"},"43913403":{"serial_id":"43913403","equip_id":"18","soldier":"12"},"44054433":{"serial_id":"44054433","equip_id":"18","soldier":"12"},"44131768":{"serial_id":"44131768","equip_id":"18","soldier":"12"},"44629586":{"serial_id":"44629586","equip_id":"18","soldier":"12"},"44629593":{"serial_id":"44629593","equip_id":"27","soldier":"8"},"44629861":{"serial_id":"44629861","equip_id":"18","soldier":"12"},"44635417":{"serial_id":"44635417","equip_id":"18","soldier":"12"},"44635419":{"serial_id":"44635419","equip_id":"18","soldier":"12"},"44635484":{"serial_id":"44635484","equip_id":"3","soldier":"10"},"44635537":{"serial_id":"44635537","equip_id":"18","soldier":"12"},"44635538":{"serial_id":"44635538","equip_id":"18","soldier":"12"},"44635544":{"serial_id":"44635544","equip_id":"18","soldier":"12"},"44635545":{"serial_id":"44635545","equip_id":"9","soldier":"10"},"44636245":{"serial_id":"44636245","equip_id":"18","soldier":"12"},"44636248":{"serial_id":"44636248","equip_id":"2","soldier":"8"},"44636446":{"serial_id":"44636446","equip_id":"2","soldier":"8"},"44636528":{"serial_id":"44636528","equip_id":"3","soldier":"10"},"44636531":{"serial_id":"44636531","equip_id":"18","soldier":"12"},"44636740":{"serial_id":"44636740","equip_id":"18","soldier":"12"},"44636742":{"serial_id":"44636742","equip_id":"18","soldier":"12"},"44643383":{"serial_id":"44643383","equip_id":"18","soldier":"12"},"44643555":{"serial_id":"44643555","equip_id":"18","soldier":"12"},"44643558":{"serial_id":"44643558","equip_id":"9","soldier":"10"},"44643560":{"serial_id":"44643560","equip_id":"18","soldier":"12"},"44643564":{"serial_id":"44643564","equip_id":"3","soldier":"8"},"44827275":{"serial_id":"44827275","equip_id":"27","soldier":"8"},"44827402":{"serial_id":"44827402","equip_id":"18","soldier":"12"},"44828261":{"serial_id":"44828261","equip_id":"9","soldier":"10"},"44928497":{"serial_id":"44928497","equip_id":"18","soldier":"12"},"44928604":{"serial_id":"44928604","equip_id":"14","soldier":"6"},"44928605":{"serial_id":"44928605","equip_id":"9","soldier":"10"},"44928610":{"serial_id":"44928610","equip_id":"9","soldier":"10"},"44928611":{"serial_id":"44928611","equip_id":"6","soldier":"8"},"44949064":{"serial_id":"44949064","equip_id":"14","soldier":"8"},"44949065":{"serial_id":"44949065","equip_id":"14","soldier":"3"},"44949066":{"serial_id":"44949066","equip_id":"9","soldier":"10"},"44949067":{"serial_id":"44949067","equip_id":"5","soldier":"7"},"44949068":{"serial_id":"44949068","equip_id":"6","soldier":"8"},"44949069":{"serial_id":"44949069","equip_id":"5","soldier":"7"},"44949070":{"serial_id":"44949070","equip_id":"14","soldier":"6"},"44970516":{"serial_id":"44970516","equip_id":"9","soldier":"10"},"44970520":{"serial_id":"44970520","equip_id":"14","soldier":"13"},"45126502":{"serial_id":"45126502","equip_id":"17","soldier":"10"},"45126531":{"serial_id":"45126531","equip_id":"17","soldier":"10"},"45271275":{"serial_id":"45271275","equip_id":"30","soldier":"6"},"45271312":{"serial_id":"45271312","equip_id":"18","soldier":"12"},"45330587":{"serial_id":"45330587","equip_id":"30","soldier":"6"},"45330589":{"serial_id":"45330589","equip_id":"8","soldier":"9"},"45330603":{"serial_id":"45330603","equip_id":"17","soldier":"10"},"45780803":{"serial_id":"45780803","equip_id":"18","soldier":"12"},"45780808":{"serial_id":"45780808","equip_id":"28","soldier":"5"},"45780822":{"serial_id":"45780822","equip_id":"18","soldier":"12"}},"t":"1b57cff5d5e4c10867dac78d738a1dcfab193e194fe4903dda8b34410e68e990790bfc73d1b9783104b6efcfc526991fa6739d5936309c56ee4546dd73f349e6","status":0,"now":"2016-07-06 22:42:05"}
+			</textarea>
+			<button type="button" onClick="display()">GO</button>
+			<p><b>Instructions:</b> Khi bạn vào giao diện game, nhấn F12 -> Chọn Tab Network -> Vào Tab Đội Ngũ (結成) trong game -> Tìm list?uid= trong phần console -> Chuột phải -> "Copy response" -> Dán vào hộp text rồi nhấn Go.
+		</div>
+		<table id="list">
+			<thead>
+			<tr>
+				<th class="num">No.</th>
+				<th class="nocase">Tên kiếm</th>
+				<th class="nocase">Loại</th>
+				<th class="num">Toku</th>
+				<th class="num">Ngày về Honmaru</th>
+				<th class="num">Trạng thái</th>
+				<th class="num">Level</th>
+				<th class="num">HP</th>
+				<th class="num">Tấn công</th>
+				<th class="num">Lãnh đạo</th>
+				<th class="num">Linh hoạt</th>
+				<th class="num">Chí mạng</th>
+				<th class="num">Tất sát</th>
+				<th class="num">Trinh sát</th>
+				<th class="num">Ngụy trang</th>
+				<th class="num">Đã đồng hành với bạn được số ngày là</th>
+			</tr>
+			</thead>
+			<tbody>
+		
+			</tbody>
+		</table>
+		<footer>
+			Last updated at
+			<span>2017/08/05 23:30 JST</span>,
+			max stats now automatically updated
+		</footer>
+	</body>
 </html>
