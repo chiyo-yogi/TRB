@@ -12,7 +12,7 @@ define = {
 		"type": "Oodachi"
 	},
 	8: {
-		"name": "Ishikirimaru",
+		"name": "Ishikirimaru Kiwame",
 		"type": "Oodachi"
 	},
 	9: {
@@ -24,7 +24,7 @@ define = {
 		"type": "Tantou"
 	},
 	12: {
-		"name": "Imanotsurugi",
+		"name": "Imanotsurugi Kiwame",
 		"type": "Tantou"
 	},
 	13: {
@@ -44,7 +44,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	20: {
-		"name": "Nikkari Aoe",
+		"name": "Nikkari Aoe Kiwame",
 		"type": "Wakizashi"
 	},
 	23: {
@@ -52,7 +52,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	24: {
-		"name": "Nakigitsune",
+		"name": "Nakigitsune Kiwame",
 		"type": "Uchigatana"
 	},
 	25: {
@@ -64,7 +64,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	28: {
-		"name": "Namazuo Toushirou",
+		"name": "Namazuo Toushirou Kiwame",
 		"type": "Wakizashi"
 	},
 	29: {
@@ -72,7 +72,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	30: {
-		"name": "Honebami Toushirou",
+		"name": "Honebami Toushirou Kiwame",
 		"type": "Wakizashi"
 	},
 	31: {
@@ -80,7 +80,7 @@ define = {
 		"type": "Tantou"
 	},
 	32: {
-		"name": "Hirano Toushirou",
+		"name": "Hirano Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	33: {
@@ -88,7 +88,7 @@ define = {
 		"type": "Tantou"
 	},
 	34: {
-		"name": "Atsushi Toushirou",
+		"name": "Atsushi Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	35: {
@@ -96,7 +96,7 @@ define = {
 		"type": "Tantou"
 	},
 	36: {
-		"name": "Gotou Toushirou",
+		"name": "Gotou Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	37: {
@@ -104,7 +104,7 @@ define = {
 		"type": "Tantou"
 	},
 	38: {
-		"name": "Shinano Toushirou",
+		"name": "Shinano Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	39: {
@@ -112,7 +112,7 @@ define = {
 		"type": "Tantou"
 	},
 	40: {
-		"name": "Maeda Toushirou",
+		"name": "Maeda Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	41: {
@@ -120,7 +120,7 @@ define = {
 		"type": "Tantou"
 	},
 	42: {
-		"name": "Akita Toushirou",
+		"name": "Akita Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	43: {
@@ -128,7 +128,7 @@ define = {
 		"type": "Tantou"
 	},
 	44: {
-		"name": "Hakata Toushirou",
+		"name": "Hakata Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	45: {
@@ -136,7 +136,7 @@ define = {
 		"type": "Tantou"
 	},
 	46: {
-		"name": "Midare Toushirou",
+		"name": "Midare Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	47: {
@@ -144,7 +144,7 @@ define = {
 		"type": "Tantou"
 	},
 	48: {
-		"name": "Gokotai",
+		"name": "Gokotai Kiwame",
 		"type": "Tantou"
 	},
 	49: {
@@ -152,7 +152,7 @@ define = {
 		"type": "Tantou"
 	},
 	50: {
-		"name": "Yagen Toushirou",
+		"name": "Yagen Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	51: {
@@ -160,7 +160,7 @@ define = {
 		"type": "Tantou"
 	},
 	52: {
-		"name": "Houchou Toushirou",
+		"name": "Houchou Toushirou Kiwame",
 		"type": "Tantou"
 	},
 	53: {
@@ -180,7 +180,7 @@ define = {
 		"type": "Oodachi"
 	},
 	60: {
-		"name": "Hotarumaru",
+		"name": "Hotarumaru Kiwame",
 		"type": "Oodachi"
 	},
 	61: {
@@ -188,7 +188,7 @@ define = {
 		"type": "Tantou"
 	},
 	62: {
-		"name": "Aizen Kunitoshi",
+		"name": "Aizen Kunitoshi Kiwame",
 		"type": "Tantou"
 	},
 	63: {
@@ -196,7 +196,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	64: {
-		"name": "Sengo Muramasa",
+		"name": "Sengo Muramasa Kiwame",
 		"type": "Uchigatana"
 	},
 	65: {
@@ -204,7 +204,7 @@ define = {
 		"type": "Yari"
 	},
 	66: {
-		"name": "Tonbokiri",
+		"name": "Tonbokiri Kiwame",
 		"type": "Yari"
 	},
 	67: {
@@ -212,7 +212,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	68: {
-		"name": "Monoyoshi Sadamune",
+		"name": "Monoyoshi Sadamune Kiwame",
 		"type": "Wakizashi"
 	},
 	69: {
@@ -220,7 +220,7 @@ define = {
 		"type": "Tantou"
 	},
 	70: {
-		"name": "Taikogane Sadamune",
+		"name": "Taikogane Sadamune Kiwame",
 		"type": "Tantou"
 	},
 	71: {
@@ -228,7 +228,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	72: {
-		"name": "Kikkou Sadamune",
+		"name": "Kikkou Sadamune Kiwame",
 		"type": "Uchigatana"
 	},
 	73: {
@@ -244,7 +244,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	82: {
-		"name": "Souza Samonji",
+		"name": "Souza Samonji Kiwame",
 		"type": "Uchigatana"
 	},
 	83: {
@@ -252,7 +252,7 @@ define = {
 		"type": "Tantou"
 	},
 	84: {
-		"name": "Sayo Samonji",
+		"name": "Sayo Samonji Kiwame",
 		"type": "Tantou"
 	},
 	85: {
@@ -260,7 +260,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	86: {
-		"name": "Kashuu Kiyomitsu",
+		"name": "Kashuu Kiyomitsu Kiwame",
 		"type": "Uchigatana"
 	},
 	87: {
@@ -268,7 +268,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	88: {
-		"name": "Yamatonokami Yasusada",
+		"name": "Yamatonokami Yasusada Kiwame",
 		"type": "Uchigatana"
 	},
 	89: {
@@ -276,7 +276,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	90: {
-		"name": "Kasen Kanesada",
+		"name": "Kasen Kanesada Kiwame",
 		"type": "Uchigatana"
 	},
 	91: {
@@ -284,7 +284,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	92: {
-		"name": "Izuminokami Kanesada",
+		"name": "Izuminokami Kanesada Kiwame",
 		"type": "Uchigatana"
 	},
 	93: {
@@ -296,7 +296,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	96: {
-		"name": "Yamanbagiri Kunihiro",
+		"name": "Yamanbagiri Kunihiro Kiwame",
 		"type": "Uchigatana"
 	},
 	97: {
@@ -308,7 +308,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	100: {
-		"name": "Horikawa Kunihiro",
+		"name": "Horikawa Kunihiro Kiwame",
 		"type": "Wakizashi"
 	},
 	101: {
@@ -316,7 +316,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	102: {
-		"name": "Hachisuka Kotetsu",
+		"name": "Hachisuka Kotetsu Kiwame",
 		"type": "Uchigatana"
 	},
 	103: {
@@ -324,7 +324,7 @@ define = {
 		"type": "Wakizashi"
 	},
 	104: {
-		"name": "Urashima Kotetsu",
+		"name": "Urashima Kotetsu Kiwame",
 		"type": "Wakizashi"
 	},
 	105: {
@@ -332,7 +332,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	105: {
-		"name": "Nagasone Kotetsu",
+		"name": "Nagasone Kotetsu Kiwame",
 		"type": "Uchigatana"
 	},
 	107: {
@@ -368,7 +368,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	117: {
-		"name": "Ookurikara",
+		"name": "Ookurikara Kiwame",
 		"type": "Uchigatana"
 	},
 	118: {
@@ -376,7 +376,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	119: {
-		"name": "Heshikiri Hasebe",
+		"name": "Heshikiri Hasebe Kiwame",
 		"type": "Uchigatana"
 	},
 	120: {
@@ -384,7 +384,7 @@ define = {
 		"type": "Tantou"
 	},
 	121: {
-		"name": "Fudou Yukimitsu",
+		"name": "Fudou Yukimitsu Kiwame",
 		"type": "Tantou"
 	},
 	122: {
@@ -400,7 +400,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	129: {
-		"name": "Doudanuki Masakuni",
+		"name": "Doudanuki Masakuni Kiwame",
 		"type": "Uchigatana"
 	},
 	130: {
@@ -412,7 +412,7 @@ define = {
 		"type": "Oodachi"
 	},
 	133: {
-		"name": "Taroutachi",
+		"name": "Taroutachi Kiwame",
 		"type": "Oodachi"
 	},
 	134: {
@@ -420,7 +420,7 @@ define = {
 		"type": "Oodachi"
 	},
 	135: {
-		"name": "Jiroutachi",
+		"name": "Jiroutachi Kiwame",
 		"type": "Oodachi"
 	},
 	136: {
@@ -428,7 +428,7 @@ define = {
 		"type": "Yari"
 	},
 	137: {
-		"name": "Nihongou",
+		"name": "Nihongou Kiwame",
 		"type": "Yari"
 	},
 	138: {
@@ -436,7 +436,7 @@ define = {
 		"type": "Yari"
 	},
 	139: {
-		"name": "Otegine",
+		"name": "Otegine Kiwame",
 		"type": "Yari"
 	},
 	140: {
@@ -511,7 +511,7 @@ define = {
 		"type": "Uchigatana"
 	},
 	176
-                "name": "Minamoto Kiyomaro",
+        "name": "Minamoto Kiyomaro",
 		"type": "Uchigatana"
 	},
 	178
