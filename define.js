@@ -479,8 +479,8 @@ define = {
 		"type": "Uchigatana"
 	},
 	160: {
-	"name": "Buzen Gou",
-	"type": "Uchigatana"
+	        "name": "Buzen Gou",
+	        "type": "Uchigatana"
 	},
 	162: {
 		"name": "Nenekirimaru",
@@ -517,6 +517,5 @@ define = {
 	178
 		"name": "Matsui Gou
 		"type": "Uchigatana"
-	},
 	}
 }
