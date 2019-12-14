@@ -491,31 +491,31 @@ define = {
 		"name": "Hakusan Yoshimitsu",
 		"type": "Tsurugi"
 	},
-	166 {
+	166: {
 		"name": "Nankaitarou Chouson",
 		"type": "Uchigatana"
 	},
-	168{
+	168: {
 		"name": "Hizen Tadahiro",
 		"type": "Wakizashi"
 	},
-	170
+	170: {
 		"name": "Chatannakiri",
 		"type": "Tantou"
 	},
-	172
+	172: {
 		"name": "Kuwana Gou",
 		"type": "Uchigatana"
 	},
-	174
+	174: {
 		"name": "Suishinshi Masahide",
 		"type": "Uchigatana"
 	},
-	176
-        "name": "Minamoto Kiyomaro
+	176: {
+                "name": "Minamoto Kiyomaro
 		"type": "Uchigatana"
 	},
-	178
+	178: {
 		"name": "Matsui Gou
 		"type": "Uchigatana"
 	}
