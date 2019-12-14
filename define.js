@@ -512,11 +512,11 @@ define = {
 		"type": "Uchigatana"
 	},
 	176: {
-                "name": "Minamoto Kiyomaro
+                "name": "Minamoto Kiyomaro:,
 		"type": "Uchigatana"
 	},
 	178: {
-		"name": "Matsui Gou
+		"name": "Matsui Gou",
 		"type": "Uchigatana"
 	}
 }
